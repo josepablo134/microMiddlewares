@@ -184,17 +184,6 @@ int32_t DriverI2C_write( int8_t fd, const void* buffer, uint32_t size ){
     ROM_I2CMasterDataPut( i2cPeriphBase , ((uint8_t*)buffer)[ 0 ] );
     ROM_I2CMasterIntClear( DriverI2C_devices[ fd ] );
 
-    if( size == 1 ){
-        /// Send a simple byte
-        ROM_I2CMasterControl( i2cPeriphBase , I2C_MASTER_CMD_SINGLE_SEND );
-        /// Wait for transaction to finish
-        while( !(I2C_MASTER_INT_DATA & ROM_I2CMasterIntStatusEx( DriverI2C_devices[ fd ] , false )) ){}
-        if( ROM_I2CMasterErr( i2cPeriphBase ) ){
-            return (int32_t)(0);
-        }
-        return 1;
-    }
-
     /// Begin a multi transaction
     ROM_I2CMasterControl( i2cPeriphBase , I2C_MASTER_CMD_BURST_SEND_START );
     /// Wait for transaction to finish
@@ -205,7 +194,7 @@ int32_t DriverI2C_write( int8_t fd, const void* buffer, uint32_t size ){
     }
 
 	/// For every byte to send do
-	for( byteCounter=1; byteCounter < size-1 ; byteCounter++ ){
+	for( byteCounter=1; byteCounter < size ; byteCounter++ ){
 	    ROM_I2CMasterDataPut( i2cPeriphBase , ((uint8_t*)buffer)[ byteCounter ] );
         ROM_I2CMasterIntClear( DriverI2C_devices[ fd ] );
 	    ROM_I2CMasterControl( i2cPeriphBase , I2C_MASTER_CMD_BURST_SEND_CONT );
@@ -216,16 +205,6 @@ int32_t DriverI2C_write( int8_t fd, const void* buffer, uint32_t size ){
 	        return (int32_t)(byteCounter-1);
 	    }
 	}
-
-	/// Sending last byte
-    ROM_I2CMasterDataPut( i2cPeriphBase , ((uint8_t*)buffer)[ byteCounter ] );
-    ROM_I2CMasterIntClear( DriverI2C_devices[ fd ] );
-    ROM_I2CMasterControl( i2cPeriphBase , I2C_MASTER_CMD_BURST_SEND_FINISH );
-    /// Wait for transaction to finish
-    while( !(I2C_MASTER_INT_DATA & ROM_I2CMasterIntStatusEx( DriverI2C_devices[ fd ] , false )) ){}
-    if( ROM_I2CMasterErr( i2cPeriphBase ) ){
-        return (int32_t)(byteCounter);
-    }
     return (int32_t)(size);
 }
 /**
@@ -252,18 +231,6 @@ int32_t DriverI2C_read( int8_t fd, void* buffer, uint32_t size ){
     SET_RECEIVE( i2cPeriphBase );
     ROM_I2CMasterIntClear( DriverI2C_devices[ fd ] );
 
-    if( size == 1 ){
-        /// Receive a single byte
-        ROM_I2CMasterControl( i2cPeriphBase , I2C_MASTER_CMD_SINGLE_RECEIVE );
-        /// Wait for transaction to finish
-            while( !(I2C_MASTER_INT_DATA & ROM_I2CMasterIntStatusEx( DriverI2C_devices[ fd ] , false )) ){}
-            if( ROM_I2CMasterErr( i2cPeriphBase ) ){
-                return 0;
-            }
-            ((uint8_t*)buffer)[ 0 ] = (uint8_t)ROM_I2CMasterDataGet( i2cPeriphBase );
-            return 1;
-    }
-
     /// Begin a multi transaction
     ROM_I2CMasterControl( i2cPeriphBase , I2C_MASTER_CMD_BURST_RECEIVE_START );
         /// Wait for transaction to finish
@@ -275,7 +242,7 @@ int32_t DriverI2C_read( int8_t fd, void* buffer, uint32_t size ){
     ((uint8_t*)buffer)[ 0 ] = (uint8_t)ROM_I2CMasterDataGet( i2cPeriphBase );
 
     /// For a burst send operation do
-    for( byteCounter=1; byteCounter < size-1 ; byteCounter++ ){
+    for( byteCounter=1; byteCounter < size ; byteCounter++ ){
         ROM_I2CMasterIntClear( DriverI2C_devices[ fd ] );
         ROM_I2CMasterControl( i2cPeriphBase , I2C_MASTER_CMD_BURST_RECEIVE_CONT );
         /// Wait for transaction to finish
@@ -287,15 +254,6 @@ int32_t DriverI2C_read( int8_t fd, void* buffer, uint32_t size ){
         ((uint8_t*)buffer)[ byteCounter ] = (uint8_t)ROM_I2CMasterDataGet( i2cPeriphBase );
     }
 
-    /// Receiving the last byte
-    ROM_I2CMasterIntClear( DriverI2C_devices[ fd ] );
-    ROM_I2CMasterControl( i2cPeriphBase , I2C_MASTER_CMD_BURST_RECEIVE_FINISH );
-    /// Wait for transaction to finish
-    while( !(I2C_MASTER_INT_DATA & ROM_I2CMasterIntStatusEx( DriverI2C_devices[ fd ] , false )) ){}
-    if( ROM_I2CMasterErr( i2cPeriphBase ) ){
-        return (int32_t)(byteCounter);
-    }
-    ((uint8_t*)buffer)[ byteCounter ] = (uint8_t)ROM_I2CMasterDataGet( i2cPeriphBase );
     return (int32_t)(size);
 }
 
