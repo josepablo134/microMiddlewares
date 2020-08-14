@@ -19,6 +19,9 @@
 #define SET_RECEIVE( BASE )     HWREG(BASE + I2C_O_MSA) |= 0x01;
 #define SET_TRANSMIT( BASE )     HWREG(BASE + I2C_O_MSA) &= ~0x01;
 
+#define START_TRANSMITION               0x00
+#define CONT_TRANSMITION                0x01
+static volatile uint8_t transmitionState=0x00;
 
 /// Initialize i2c buffer
 void DriverI2C_init(void){
@@ -84,6 +87,7 @@ int8_t DriverI2C_ioctl( int8_t fd , uint32_t config , void* buffer ){
             break;
         /// Release the i2c bus in idle state
 		case DriverI2C_IOCTL_CMD_STOP_TRANSACTION:
+		    transmitionState=START_TRANSMITION;
 		    ROM_I2CMasterControl( DriverI2C_devices[ fd ] , I2C_MASTER_CMD_BURST_RECEIVE_ERROR_STOP );///< Stop hard state machine
 			break;
 		/// Send a simple byte with stop bit
@@ -185,10 +189,16 @@ int32_t DriverI2C_write( int8_t fd, const void* buffer, uint32_t size ){
     ROM_I2CMasterIntClear( DriverI2C_devices[ fd ] );
 
     /// Begin a multi transaction
-    ROM_I2CMasterControl( i2cPeriphBase , I2C_MASTER_CMD_BURST_SEND_START );
+    if( transmitionState == START_TRANSMITION ){
+        transmitionState = CONT_TRANSMITION;
+        ROM_I2CMasterControl( i2cPeriphBase , I2C_MASTER_CMD_BURST_SEND_START );
+    }else{
+        ROM_I2CMasterControl( i2cPeriphBase , I2C_MASTER_CMD_BURST_SEND_CONT );
+    }
     /// Wait for transaction to finish
     while( !(I2C_MASTER_INT_DATA & ROM_I2CMasterIntStatusEx( DriverI2C_devices[ fd ] , false )) ){}
     if( ROM_I2CMasterErr( i2cPeriphBase ) ){
+        transmitionState = START_TRANSMITION;
         ROM_I2CMasterControl( i2cPeriphBase , I2C_MASTER_CMD_BURST_SEND_ERROR_STOP );///< Stop hard state machine
         return (int32_t)(0);
     }
@@ -201,6 +211,7 @@ int32_t DriverI2C_write( int8_t fd, const void* buffer, uint32_t size ){
         /// Wait for transaction to finish
         while( !(I2C_MASTER_INT_DATA & ROM_I2CMasterIntStatusEx( DriverI2C_devices[ fd ] , false )) ){}
 	    if( ROM_I2CMasterErr( i2cPeriphBase ) ){
+            transmitionState = START_TRANSMITION;
 	        ROM_I2CMasterControl( i2cPeriphBase , I2C_MASTER_CMD_BURST_SEND_ERROR_STOP );///< Stop hard state machine
 	        return (int32_t)(byteCounter-1);
 	    }
@@ -232,10 +243,16 @@ int32_t DriverI2C_read( int8_t fd, void* buffer, uint32_t size ){
     ROM_I2CMasterIntClear( DriverI2C_devices[ fd ] );
 
     /// Begin a multi transaction
-    ROM_I2CMasterControl( i2cPeriphBase , I2C_MASTER_CMD_BURST_RECEIVE_START );
+    if( transmitionState == START_TRANSMITION ){
+        transmitionState = CONT_TRANSMITION;
+        ROM_I2CMasterControl( i2cPeriphBase , I2C_MASTER_CMD_BURST_RECEIVE_START );
+    }else{
+        ROM_I2CMasterControl( i2cPeriphBase , I2C_MASTER_CMD_BURST_RECEIVE_CONT );
+    }
         /// Wait for transaction to finish
         while( !(I2C_MASTER_INT_DATA & ROM_I2CMasterIntStatusEx( DriverI2C_devices[ fd ] , false )) ){}
         if( ROM_I2CMasterErr( i2cPeriphBase ) ){
+            transmitionState = START_TRANSMITION;
             ROM_I2CMasterControl( i2cPeriphBase , I2C_MASTER_CMD_BURST_RECEIVE_ERROR_STOP );///< Stop hard state machine
             return 0;
         }
@@ -248,6 +265,7 @@ int32_t DriverI2C_read( int8_t fd, void* buffer, uint32_t size ){
         /// Wait for transaction to finish
         while( !(I2C_MASTER_INT_DATA & ROM_I2CMasterIntStatusEx( DriverI2C_devices[ fd ] , false )) ){}
         if( ROM_I2CMasterErr( i2cPeriphBase ) ){
+            transmitionState = START_TRANSMITION;
             ROM_I2CMasterControl( i2cPeriphBase , I2C_MASTER_CMD_BURST_RECEIVE_ERROR_STOP );///< Stop hard state machine
             return (int32_t)(byteCounter-1);
         }
