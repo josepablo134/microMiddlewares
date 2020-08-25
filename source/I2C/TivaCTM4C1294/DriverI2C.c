@@ -16,7 +16,6 @@
 #include <driverlib/i2c.h>
 #include <driverlib/pin_map.h>
 #include <driverlib/sysctl.h>
-#include <driverlib/uart.h>
 
 #define SET_RECEIVE( BASE )     HWREG(BASE + I2C_O_MSA) |= 0x01;
 #define SET_TRANSMIT( BASE )     HWREG(BASE + I2C_O_MSA) &= ~0x01;
