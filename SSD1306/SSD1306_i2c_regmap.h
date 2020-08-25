@@ -1,10 +1,3 @@
-/*
- * SSD1306_i2c_regmap.h
- *
- *  Created on: 12 ago. 2020
- *      Author: josepablocb
- */
-
 #ifndef SSD1306_I2C_REGMAP_H_
 #define SSD1306_I2C_REGMAP_H_
 

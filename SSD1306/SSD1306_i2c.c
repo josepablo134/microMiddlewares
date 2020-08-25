@@ -24,7 +24,7 @@ int SSD1306_open(){
     return 0;
 }
 
-int SSD1306_write( void *buffer , uint32_t size ){
+int SSD1306_write( const void *buffer , uint32_t size ){
     if( !buffer || !size ){
         return -1;
     }
@@ -57,7 +57,7 @@ int SSD1306_ioctl(uint32_t config , void* buffer){
             return SSD1306_writeCommand( (uint8_t)(SSD1306_IOCTL_CMD_DATA & config) );
         }
         case SSD1306_IOCTL_SENDCMD_ARRY:
-        {    if( !buffer ){ return SSD1306_ERROR; }
+        {   if( !buffer ){ return SSD1306_ERROR; }
             uint8_t size = (uint8_t)(SSD1306_IOCTL_CMD_DATA & config);
             if( SSD1306_writeCommandList( buffer , size ) < size ){
                 return -1;
@@ -66,6 +66,13 @@ int SSD1306_ioctl(uint32_t config , void* buffer){
         case SSD1306_IOCTL_CLC:
         {
             return SSD1306_clc();
+        }
+        case SSD1306_IOCTL_DEF_CONF:
+        {
+            if( SSD1306_defaultConfig() < 0 ){
+                return -1;
+            }
+            return 0;
         }
     }
     return 0;

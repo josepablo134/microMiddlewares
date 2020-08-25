@@ -35,11 +35,13 @@
 
     /// Clear screen
     #define SSD1306_IOCTL_CLC                       0x0500
+    /// Default configuration
+    #define SSD1306_IOCTL_DEF_CONF                  0x0600
 
     extern void SSD1306_init();
     extern int SSD1306_open();
-    extern int SSD1306_write( void *buffer , uint32_t size );
-    extern int SSD1306_ioctl(uint32_t config , void* buffer);
+    extern int SSD1306_write( const void *buffer , uint32_t size );
+    extern int SSD1306_ioctl( uint32_t config , void* buffer);
 
 #ifdef __cplusplus
     }

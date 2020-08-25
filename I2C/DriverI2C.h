@@ -50,7 +50,7 @@
 	 *  @param  i2c_device An integer that identifies the i2c peripheral.
 	 *  @return An integer file descriptor or DriverI2C_ERROR
 	 */
-	extern int8_t DriverI2C_open( uint8_t i2c_device);
+	extern int DriverI2C_open( unsigned int i2c_device );
 
 	/**
 	 *  Special configuration can be set or read.
@@ -67,24 +67,24 @@
 	 *      DriverI2C_ioctl( i2cFd , DriverI2C_IOCTL_CMD_READ_REG | regAddr , tempBuffer );
 	 *  @endcode
 	 */
-	extern int8_t DriverI2C_ioctl( int8_t fd , uint32_t config , void* buffer );
+	extern int DriverI2C_ioctl( int fd , unsigned int config , void* buffer );
 
 	///	Release a file descriptor
-	extern void DriverI2C_close( int8_t fd );
+	extern void DriverI2C_close( int fd );
 
 	/**
 	 * Send a byte array with length from 1 to 4Gb, the buffer stores the data
 	 * and should be persistent while the transaction take place.
 	 * In case of success the bus does not return to idle.
 	 */
-	extern int32_t DriverI2C_write( int8_t fd, const void* buffer, uint32_t size);
+	extern int DriverI2C_write( int fd, const void* buffer, unsigned int size );
 
 	/**
 	 * Receive a byte array with length from 1 to 4Gb, the buffer stores the data
 	 * and should be persistent while the transaction take place.
      * In case of success the bus does not return to idle.
 	 */
-	extern int32_t DriverI2C_read( int8_t fd, void* buffer, uint32_t size);
+	extern int DriverI2C_read( int fd, void* buffer, unsigned int size );
 
 #ifdef __cplusplus
     }

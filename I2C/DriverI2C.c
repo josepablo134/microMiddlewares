@@ -7,7 +7,6 @@
 #include <inc/hw_types.h>
 #include <inc/hw_gpio.h>
 
-
 #include <driverlib/rom.h>
 #include <driverlib/flash.h>
 #include <driverlib/gpio.h>
@@ -56,7 +55,7 @@ void DriverI2C_init(void){
     ROM_GPIOPinTypeI2C(GPIO_PORTA_BASE, GPIO_PIN_3);
 }
 ///	Acquire a file descriptor for i2c
-int8_t DriverI2C_open( uint8_t i2c_device ){
+int DriverI2C_open( unsigned int i2c_device ){
     if( i2c_device >= EK_TM4C1294XL_I2CCOUNT ){
         return DriverI2C_ERROR;
     }
@@ -68,7 +67,7 @@ int8_t DriverI2C_open( uint8_t i2c_device ){
     ROM_I2CRxFIFOFlush( DriverI2C_devices[ i2c_device ] );
 	return (int8_t)i2c_device;
 }
-int8_t DriverI2C_ioctl( int8_t fd , uint32_t config , void* buffer ){
+int DriverI2C_ioctl( int fd , unsigned int config , void* buffer ){
     if( fd >= EK_TM4C1294XL_I2CCOUNT){
         return DriverI2C_ERROR;
     }
@@ -155,7 +154,7 @@ int8_t DriverI2C_ioctl( int8_t fd , uint32_t config , void* buffer ){
     return 0;
 }
 ///	Release a file descriptor for i2c
-void DriverI2C_close( int8_t fd ){
+void DriverI2C_close( int fd ){
     if( fd >= EK_TM4C1294XL_I2CCOUNT ){
         return;///< Nothing to do
     }
@@ -170,7 +169,7 @@ void DriverI2C_close( int8_t fd ){
 *
 *	@return int32_t total of bytes sended, in case of error returns DriverI2C_ERROR
  */
-int32_t DriverI2C_write( int8_t fd, const void* buffer, uint32_t size ){
+int DriverI2C_write( int fd, const void* buffer, unsigned int size ){
     uint32_t i2cPeriphBase;
     uint32_t byteCounter;
 	if( !buffer || !size ){///< No buffer , size too small
@@ -227,7 +226,7 @@ int32_t DriverI2C_write( int8_t fd, const void* buffer, uint32_t size ){
 *
 *	@return int32_t total of bytes received, in case of error returns DriverI2C_ERROR
  */
-int32_t DriverI2C_read( int8_t fd, void* buffer, uint32_t size ){
+int DriverI2C_read( int fd, void* buffer, unsigned int size ){
     uint32_t i2cPeriphBase;
     uint32_t byteCounter;
     if( !buffer || !size  ){///< No buffer , size too small
