@@ -1,9 +1,12 @@
-/// Function prototypes
-#include "SSD1306.h"
-#include "SSD1306_i2c.h"
+/// Include Middleware description
+//  requires a compilation environment that includes
+//  the directory "include/"
+#include <SSD1306/SSD1306.h>
+#include <SSD1306/SSD1306_i2c.h>
+
 /// Specific configuration
-#include "SSD1306_i2c_config.h"
-#include "SSD1306_i2c_regmap.h"
+#include <SSD1306/SSD1306_i2c_config.h>
+#include <SSD1306/SSD1306_i2c_regmap.h>
 
 /// Middleware
 #include <I2C/DriverI2C.h>

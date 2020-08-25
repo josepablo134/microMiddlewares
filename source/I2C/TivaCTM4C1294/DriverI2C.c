@@ -1,5 +1,8 @@
-#include "DriverI2C.h"
-#include "DriverI2C_config.h"
+/// Include Middleware description
+//  requires a compilation environment that includes
+//  the directory "include/"
+#include <I2C/DriverI2C.h>
+#include <I2C/DriverI2C_config.h>
 
 #include <inc/hw_i2c.h>
 #include <inc/hw_ints.h>
