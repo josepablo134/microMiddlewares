@@ -6,7 +6,7 @@
 #include <stdlib.h>
 
 void gfx_init( framebuffer_t* fb ){
-	ASSERT( fb == 0x00 );
+	ASSERT( fb != 0x00 );
 	fb->buffer = 0x00;
 	fb->buffLength = 0x00;
 	fb->height = 0x00;
@@ -16,9 +16,9 @@ void gfx_init( framebuffer_t* fb ){
 }
 
 void gfx_merge( framebuffer_t* fbDest , framebuffer_t* fbA , framebuffer_t* fbB ){
-	ASSERT( fbDest == 0x00 );
-	ASSERT( fbA == 0x00 );
-	ASSERT( fbB == 0x00 );
+	ASSERT( fbDest != 0x00 );
+	ASSERT( fbA != 0x00 );
+	ASSERT( fbB != 0x00 );
 	if( fbDest->buffLength != fbA->buffLength ||
 		fbDest->buffLength != fbB->buffLength )
 	{return;}

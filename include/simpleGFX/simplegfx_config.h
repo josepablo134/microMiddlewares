@@ -15,13 +15,14 @@
     /// Avoid overflow and underflow remapping
 	#define GFX_AVOID_OVERFLOW_REMAPPING
 
-	///	Not related with GFX Driver
+    /// Not related with GFX Driver
+    //  User defined values
     #define GFX_WIDTH        (128)
-    #define GFX_HEIGHT       (64)
+    #define GFX_HEIGHT       (32)
     #define GFX_PIXELS       (GFX_HEIGTH * GFX_WIDTH)
-	#define GFX_COLUMNS      (128)
-	#define GFX_PAGES		 (8)
-	#define	GFX_BUFFER		 (GFX_COLUMNS * GFX_PAGES)
+    #define GFX_COLUMNS      GFX_WIDTH
+    #define GFX_PAGES        (4)
+    #define GFX_BUFFER       (GFX_COLUMNS * GFX_PAGES)
 
 #ifdef __cplusplus
     }
