@@ -55,14 +55,9 @@
 		uint8_t		*param;
 	};
 
-	struct ILI9341_pageAddrRange{
-		uint16_t	startPage;
-		uint16_t	endPage;
-	};
-
-	struct ILI9341_columnAddrRange{
-		uint16_t	startColumn;
-		uint16_t	endColumn;
+	struct ILI9341_addrRange{
+		uint16_t	start;
+		uint16_t	end;
 	};
 
 	///	Initialize controller registers

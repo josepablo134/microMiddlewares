@@ -68,17 +68,21 @@ int ILI9341_ioctl( unsigned int config , void* buffer ){
 		}
     	case ILI9341_IOCTL_SET_PAGE_RANGE:
 		{
+			uint8_t    rangData[4];
             if( !buffer ){ return -1; }
             /// Ensuring IDLE BUS
             Driver8080_ioctl( Driver8080_IOCTL_CMD_RELEASE, 0x00);
 
-            struct ILI9341_pageAddrRange  *range;
-            range = (struct ILI9341_pageAddrRange*) buffer;
+            struct ILI9341_addrRange  *range;
+            range = (struct ILI9341_addrRange*) buffer;
 
             /// Sending SET PAGE command
             Driver8080_ioctl( Driver8080_IOCTL_CMD_BEGIN_WR | ILI9341_PAG_ADDR_SET, 0x00);
-            Driver8080_write( &range->startPage , 2 );
-            Driver8080_write( &range->endPage , 2 );
+                rangData[0] = (range->start>>8);
+                rangData[1] = (range->start);
+                rangData[2] = (range->end>>8);
+                rangData[3] = (range->end);
+                Driver8080_write( &rangData , sizeof(rangData) );
 
             /// Releasing bus
             Driver8080_ioctl( Driver8080_IOCTL_CMD_RELEASE, 0x00);
@@ -86,17 +90,21 @@ int ILI9341_ioctl( unsigned int config , void* buffer ){
 		}
     	case ILI9341_IOCTL_SET_COL_RANGE:
 		{
+            uint8_t    rangData[4];
             if( !buffer ){ return -1; }
             /// Ensuring IDLE BUS
             Driver8080_ioctl( Driver8080_IOCTL_CMD_RELEASE, 0x00);
 
-            struct ILI9341_columnAddrRange  *range;
-            range = (struct ILI9341_columnAddrRange*) buffer;
+            struct ILI9341_addrRange  *range;
+            range = (struct ILI9341_addrRange*) buffer;
 
-            /// Sending SET START PAGE command
+            /// Sending SET PAGE command
             Driver8080_ioctl( Driver8080_IOCTL_CMD_BEGIN_WR | ILI9341_COL_ADDR_SET, 0x00);
-            Driver8080_write( &range->startColumn , 2 );
-            Driver8080_write( &range->endColumn , 2 );
+                rangData[0] = (range->start>>8);
+                rangData[1] = (range->start);
+                rangData[2] = (range->end>>8);
+                rangData[3] = (range->end);
+                Driver8080_write( &rangData , sizeof(rangData) );
 
             /// Releasing bus
             Driver8080_ioctl( Driver8080_IOCTL_CMD_RELEASE, 0x00);

@@ -5,17 +5,15 @@
 #include <DEBUG.h>
 #include <stdlib.h>
 
-void gfx_init( framebuffer_t* fb ){
+void gfx_init( struct framebuffer_t* fb ){
 	ASSERT( fb != 0x00 );
 	fb->buffer = 0x00;
 	fb->buffLength = 0x00;
 	fb->height = 0x00;
 	fb->width = 0x00;
-	fb->pages = 0x00;
-	fb->columns = 0x00;
 }
 
-void gfx_merge( framebuffer_t* fbDest , framebuffer_t* fbA , framebuffer_t* fbB ){
+void gfx_merge( struct framebuffer_t* fbDest , struct framebuffer_t* fbA , struct framebuffer_t* fbB ){
 	ASSERT( fbDest != 0x00 );
 	ASSERT( fbA != 0x00 );
 	ASSERT( fbB != 0x00 );
@@ -42,7 +40,7 @@ void gfx_merge( framebuffer_t* fbDest , framebuffer_t* fbA , framebuffer_t* fbB 
 	}
 }
 
-void gfx_drawHLine( framebuffer_t* fb , uint16_t x , uint16_t y , uint16_t length , uint32_t value ){
+void gfx_drawHLine( struct framebuffer_t* fb , uint16_t x , uint16_t y , uint16_t length , uint32_t value ){
     uint16_t        xcoor = x;
     uint16_t        len = length;
     while( len-- ){
@@ -51,7 +49,7 @@ void gfx_drawHLine( framebuffer_t* fb , uint16_t x , uint16_t y , uint16_t lengt
     }
 }
 
-void gfx_drawVLine( framebuffer_t* fb , uint16_t x , uint16_t y , uint16_t length , uint32_t value ){
+void gfx_drawVLine( struct framebuffer_t* fb , uint16_t x , uint16_t y , uint16_t length , uint32_t value ){
     uint16_t        ycoor = y;
     uint16_t        len = length;
     while( len-- ){
@@ -60,7 +58,7 @@ void gfx_drawVLine( framebuffer_t* fb , uint16_t x , uint16_t y , uint16_t lengt
     }
 }
 
-void gfx_drawLine( framebuffer_t* fb , uint16_t x0 , uint16_t y0 , uint16_t x1 , uint16_t y1 , uint32_t value ){
+void gfx_drawLine( struct framebuffer_t* fb , uint16_t x0 , uint16_t y0 , uint16_t x1 , uint16_t y1 , uint32_t value ){
 	if( (x0+y0) >= (x1+y1) ){
 	///	Swap values if required
 		register uint16_t	temp;
@@ -127,14 +125,14 @@ void gfx_drawLine( framebuffer_t* fb , uint16_t x0 , uint16_t y0 , uint16_t x1 ,
 	}
 }
 
-void gfx_drawTriangle( framebuffer_t* fb , uint16_t x0 , uint16_t y0 , uint16_t x1 , uint16_t y1 ,
+void gfx_drawTriangle( struct framebuffer_t* fb , uint16_t x0 , uint16_t y0 , uint16_t x1 , uint16_t y1 ,
 									uint16_t x2 , uint16_t y2 , uint32_t value ){
 	gfx_drawLine( fb , x0 , y0 , x1 , y1 , value );
 	gfx_drawLine( fb , x0 , y0 , x2 , y2 , value );
 	gfx_drawLine( fb , x1 , y1 , x2 , y2 , value );
 }
 
-void gfx_drawRect( framebuffer_t* fb , uint16_t x , uint16_t y , uint16_t w , uint16_t h , uint32_t value ){
+void gfx_drawRect( struct framebuffer_t* fb , uint16_t x , uint16_t y , uint16_t w , uint16_t h , uint32_t value ){
 	gfx_drawHLine( fb , x , y , w , value );
 	gfx_drawHLine( fb , x , y + h - 1 , w , value );
 
@@ -142,7 +140,7 @@ void gfx_drawRect( framebuffer_t* fb , uint16_t x , uint16_t y , uint16_t w , ui
 	gfx_drawVLine( fb , x + w - 1 , y , h , value );
 }
 
-void gfx_drawCircle( framebuffer_t* fb , uint16_t x0 , uint16_t y0 , uint16_t r , uint32_t value ){
+void gfx_drawCircle( struct framebuffer_t* fb , uint16_t x0 , uint16_t y0 , uint16_t r , uint32_t value ){
   int16_t f = 1 - r;
   int16_t ddF_x = 1;
   int16_t ddF_y = -2 * r;
