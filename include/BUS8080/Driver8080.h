@@ -36,6 +36,9 @@
 	//	requires a byte for address length
 	#define Driver8080_IOCTL_CMD_BEGIN_RD_ARR		0x00000500
 
+	///	Send a rst signal
+	#define Driver8080_IOCTL_CMD_RST				0x00000600
+
 	extern void Driver8080_init(void);
 	extern int Driver8080_open(void);
 	extern int Driver8080_ioctl( unsigned int config , void* buffer );

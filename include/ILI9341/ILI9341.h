@@ -20,31 +20,34 @@
     #define ILI9341_IOCTL_DATA_MASK            	0x000000FF
 
 	///	Write command
-	#define ILI9341_IOCTL_CMD_SENDCMD			0x00000100
+	#define ILI9341_IOCTL_SEND_CMD              0x00000100
 
 	///	Begin data writing
-	#define ILI9341_IOCTL_CMD_BEGNWR			0x00000200
+	#define ILI9341_IOCTL_BEGIN_WR              0x00000200
 
 	///	Begin data reading
-	#define ILI9341_IOCTL_CMD_BEGNRD			0x00000201
+	#define ILI9341_IOCTL_BEGIN_RD              0x00000300
 
 	///	Stop reading / writing
-	#define ILI9341_IOCTL_CMD_STOPRW			0x00000300
+	#define ILI9341_IOCTL_STOP_RW               0x00000400
 
 	///	Set default config
-    #define ILI9341_IOCTL_DEFAULT_CONFG			0x00000400
+    #define ILI9341_IOCTL_DEFAULT_CONFG			0x00000500
 
 	///	Set page address range
-    #define ILI9341_IOCTL_SET_PAGE_RANGE		0x00000500
+    #define ILI9341_IOCTL_SET_PAGE_RANGE		0x00000600
 
 	///	Set column address range
-    #define ILI9341_IOCTL_SET_COL_RANGE			0x00000600
+    #define ILI9341_IOCTL_SET_COL_RANGE			0x00000700
 
 	///	Power on device
-	#define	ILI9341_IOCTL_POWERON				0x00000700
+	#define	ILI9341_IOCTL_POWERON				0x00000800
 
 	///	Power off device
-	#define	ILI9341_IOCTL_POWEROFF				0x00000800
+	#define	ILI9341_IOCTL_POWEROFF				0x00000900
+
+    /// Reset device
+    #define ILI9341_IOCTL_RESET                 0x00000A00
 
 	struct ILI9341_command{
 		uint8_t		cmd;

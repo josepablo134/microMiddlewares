@@ -26,20 +26,23 @@
 
 #define CTL_BUS_PERIPH		SYSCTL_PERIPH_GPIOE
 #define CTL_BUS_BASE		GPIO_PORTE_BASE
-#define CTL_BUS_MASK		0x0F
+#define CTL_BUS_MASK		0x1F
 #define	CTL_BUS_CS			0x01
 #define	CTL_BUS_WR			0x02
 #define	CTL_BUS_RD			0x04
 #define	CTL_BUS_DC			0x08
+#define CTL_BUS_RST			0x10
 
 /// Disable RD and strobe WR
-#define	STROBE_WR()		{ROM_GPIOPinWrite( CTL_BUS_BASE,CTL_BUS_RD|CTL_BUS_WR, CTL_BUS_RD );\
-						ROM_GPIOPinWrite( CTL_BUS_BASE,CTL_BUS_WR,CTL_BUS_WR );}
+#define	STROBE_WR_INIT(){ROM_GPIOPinWrite( CTL_BUS_BASE,CTL_BUS_RD|CTL_BUS_WR, CTL_BUS_RD );}
+#define	STROBE_WR()		{ROM_GPIOPinWrite( CTL_BUS_BASE,CTL_BUS_WR,CTL_BUS_WR );}
 
 /// Disable WR and strobe RD
 #define	STROBE_RD_INIT(){ROM_GPIOPinWrite( CTL_BUS_BASE,CTL_BUS_RD|CTL_BUS_WR, CTL_BUS_WR );}
-
 #define	STROBE_RD()		{ROM_GPIOPinWrite( CTL_BUS_BASE,CTL_BUS_RD,CTL_BUS_RD );}
+
+#define STROBE_RST_INIT(){ROM_GPIOPinWrite( CTL_BUS_BASE,CTL_BUS_RST,0x00);}
+#define STROBE_RST(){ROM_GPIOPinWrite( CTL_BUS_BASE,CTL_BUS_RST,CTL_BUS_RST);}
 
 /// Enable bus setting CS
 #define ENABLE_BUS()	{ROM_GPIOPinWrite( CTL_BUS_BASE , CTL_BUS_CS , 0x00 );}
@@ -56,7 +59,8 @@
 #define	SET_BUS_INPUT()		{ROM_GPIOPinTypeGPIOInput( DATA_BUS_BASE , DATA_BUS_MASK );}
 
 /// Set data lines as output
-#define	SET_BUS_OUTPUT()	{ROM_GPIOPinTypeGPIOOutput( DATA_BUS_BASE , DATA_BUS_MASK );}
+#define	SET_BUS_OUTPUT()	{ROM_GPIOPinTypeGPIOOutput( DATA_BUS_BASE , DATA_BUS_MASK );\
+	GPIOPadConfigSet( DATA_BUS_BASE , DATA_BUS_MASK , GPIO_STRENGTH_12MA , GPIO_PIN_TYPE_STD );}
 
 #define SET_DATA( DATA )	{ROM_GPIOPinWrite( DATA_BUS_BASE , DATA_BUS_MASK, DATA);}
 
@@ -73,6 +77,10 @@ void Driver8080_init(void){
 int Driver8080_open( void ){
     ROM_GPIOPinTypeGPIOOutput( DATA_BUS_BASE , DATA_BUS_MASK );
     ROM_GPIOPinTypeGPIOOutput( CTL_BUS_BASE , CTL_BUS_MASK );
+	GPIOPadConfigSet( DATA_BUS_BASE , DATA_BUS_MASK , GPIO_STRENGTH_12MA , GPIO_PIN_TYPE_STD );
+    GPIOPadConfigSet( CTL_BUS_BASE , CTL_BUS_MASK , GPIO_STRENGTH_12MA , GPIO_PIN_TYPE_STD );
+
+    DISABLE_BUS();
 	return 0;
 }
 
@@ -90,8 +98,9 @@ int Driver8080_ioctl( unsigned int config , void* buffer ){
 			///	Sending the address
 			ENABLE_BUS();
 			SET_BUS_OUTPUT();
-			SET_DATA( config & Driver8080_IOCTL_DATA_MASK );
-			CMD_MODE();
+			STROBE_WR_INIT();
+				CMD_MODE();
+				SET_DATA( config & Driver8080_IOCTL_DATA_MASK );
 			STROBE_WR();
 			return 0;
 		}
@@ -100,8 +109,9 @@ int Driver8080_ioctl( unsigned int config , void* buffer ){
 			///	Sending the address
 			ENABLE_BUS();
 			SET_BUS_OUTPUT();
-			SET_DATA( config & Driver8080_IOCTL_DATA_MASK );
-			CMD_MODE();
+			STROBE_WR_INIT();
+				CMD_MODE();
+				SET_DATA( config & Driver8080_IOCTL_DATA_MASK );
 			STROBE_WR();
 
 			///	Reading invalid byte
@@ -119,6 +129,7 @@ int Driver8080_ioctl( unsigned int config , void* buffer ){
 			SET_BUS_OUTPUT();
 			CMD_MODE();
 			for( counter=0; counter < config & Driver8080_IOCTL_DATA_MASK; counter++){
+				STROBE_WR_INIT();
 				SET_DATA( ((uint8_t*)buffer)[counter] );
 				STROBE_WR();
 			}
@@ -132,6 +143,7 @@ int Driver8080_ioctl( unsigned int config , void* buffer ){
 			SET_BUS_OUTPUT();
 			CMD_MODE();
 			for( counter=0; counter < config & Driver8080_IOCTL_DATA_MASK; counter++){
+				STROBE_WR_INIT();
 				SET_DATA( ((uint8_t*)buffer)[counter] );
 				STROBE_WR();
 			}
@@ -140,6 +152,13 @@ int Driver8080_ioctl( unsigned int config , void* buffer ){
 			DATA_MODE();
 			STROBE_RD_INIT();
 			STROBE_RD();
+			return 0;
+		}
+		case Driver8080_IOCTL_CMD_RST:
+		{
+			DISABLE_BUS();
+			STROBE_RST_INIT();
+			STROBE_RST();
 			return 0;
 		}
 	}
@@ -156,6 +175,7 @@ int Driver8080_write( const void* buffer, unsigned int size ){
 	SET_BUS_OUTPUT();
 	DATA_MODE();
 	for( counter=0; counter < size; counter++){
+		STROBE_WR_INIT();
 		SET_DATA( ((uint8_t*)buffer)[counter] );
 		STROBE_WR();
 	}

@@ -21,7 +21,7 @@
     #define GFX_HEIGHT       (32)
     #define GFX_PIXELS       (GFX_HEIGTH * GFX_WIDTH)
     #define GFX_COLUMNS      GFX_WIDTH
-    #define GFX_PAGES        (4)
+    #define GFX_PAGES        (GFX_HEIGHT / 8)
     #define GFX_BUFFER       (GFX_COLUMNS * GFX_PAGES)
 
 #ifdef __cplusplus
