@@ -98,8 +98,8 @@ int Driver8080_ioctl( unsigned int config , void* buffer ){
 			///	Sending the address
 			ENABLE_BUS();
 			SET_BUS_OUTPUT();
+            CMD_MODE();
 			STROBE_WR_INIT();
-				CMD_MODE();
 				SET_DATA( config & Driver8080_IOCTL_DATA_MASK );
 			STROBE_WR();
 			return 0;
@@ -109,8 +109,8 @@ int Driver8080_ioctl( unsigned int config , void* buffer ){
 			///	Sending the address
 			ENABLE_BUS();
 			SET_BUS_OUTPUT();
+            CMD_MODE();
 			STROBE_WR_INIT();
-				CMD_MODE();
 				SET_DATA( config & Driver8080_IOCTL_DATA_MASK );
 			STROBE_WR();
 

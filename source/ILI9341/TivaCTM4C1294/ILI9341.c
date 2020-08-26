@@ -63,59 +63,8 @@ int ILI9341_ioctl( unsigned int config , void* buffer ){
 			return Driver8080_ioctl(Driver8080_IOCTL_CMD_RELEASE, 0x00);
 		}
     	case ILI9341_IOCTL_DEFAULT_CONFG:
-		{
-		    uint8_t         buf[2];
-		    /// Ensuring IDLE BUS
-		    Driver8080_ioctl( Driver8080_IOCTL_CMD_RELEASE, 0x00);
-			///	Sending commands and parameters
-		    Driver8080_ioctl( Driver8080_IOCTL_CMD_BEGIN_WR | ILI9341_POWER_CTL1 , 0x00 );
-                buf[0] = 0x23;
-                Driver8080_write( buf , 1 );
-                Driver8080_ioctl( Driver8080_IOCTL_CMD_RELEASE, 0x00);
-
-		    Driver8080_ioctl( Driver8080_IOCTL_CMD_BEGIN_WR | ILI9341_POWER_CTL2 , 0x00 );
-			    buf[0] = 0x10;
-			    Driver8080_write( buf , 1 );
-	            Driver8080_ioctl( Driver8080_IOCTL_CMD_RELEASE, 0x00);
-
-		    Driver8080_ioctl( Driver8080_IOCTL_CMD_BEGIN_WR | ILI9341_VCOM_CTL1 , 0x00 );
-                buf[0] = 0x2B;
-                buf[1] = 0x2B;
-		        Driver8080_write( buf , 2 );
-	            Driver8080_ioctl( Driver8080_IOCTL_CMD_RELEASE, 0x00);
-
-		    Driver8080_ioctl( Driver8080_IOCTL_CMD_BEGIN_WR | ILI9341_VCOM_CTL2 , 0x00 );
-                buf[0] = 0xC0;
-		        Driver8080_write( buf , 1 );
-	            Driver8080_ioctl( Driver8080_IOCTL_CMD_RELEASE, 0x00);
-
-		    Driver8080_ioctl( Driver8080_IOCTL_CMD_BEGIN_WR | ILI9341_MEM_ACCESS_CTL , 0x00 );
-                buf[0] = 0x08;//0x80 | 0x08;//MADCTL_MY | MADCTL_BGR
-		        Driver8080_write( buf , 1 );
-	            Driver8080_ioctl( Driver8080_IOCTL_CMD_RELEASE, 0x00);
-
-		    Driver8080_ioctl( Driver8080_IOCTL_CMD_BEGIN_WR | ILI9341_PIXEL_FMT_SET , 0x00 );
-                //buf[0] = 0x55;// 16 bits per pixel
-                buf[0] = 0x66;// 18 bits per pixel
-                Driver8080_write( buf , 1 );
-                Driver8080_ioctl( Driver8080_IOCTL_CMD_RELEASE, 0x00);
-
-            Driver8080_ioctl( Driver8080_IOCTL_CMD_BEGIN_WR | ILI9341_FRAME_CTL_NORMAL , 0x00 );
-                buf[0] = 0x1B;
-                buf[1] = 0x00;
-		        Driver8080_write( buf , 2 );
-	            Driver8080_ioctl( Driver8080_IOCTL_CMD_RELEASE, 0x00);
-
-		    Driver8080_ioctl( Driver8080_IOCTL_CMD_BEGIN_WR | ILI9341_ENTRY_MODE_SET , 0x00 );
-                buf[0] = 0x07;
-		        Driver8080_write( buf , 1 );
-	            Driver8080_ioctl( Driver8080_IOCTL_CMD_RELEASE, 0x00);
-
-		    Driver8080_ioctl( Driver8080_IOCTL_CMD_BEGIN_WR | ILI9341_SLEEP_OUT , 0x00 );
-
-		    /// Release buffer
-            Driver8080_ioctl( Driver8080_IOCTL_CMD_RELEASE, 0x00);
-			return 0;
+    	{
+			return -1;
 		}
     	case ILI9341_IOCTL_SET_PAGE_RANGE:
 		{
