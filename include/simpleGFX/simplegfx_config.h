@@ -7,9 +7,9 @@
 #endif
 
 	///	Enable data format
-	//#define	GFX_1BIT_MODE
+	#define	GFX_1BIT_MODE
 	//#define	GFX_8BIT_MODE
-	#define	GFX_16BIT_MODE
+	//#define	GFX_16BIT_MODE
 	//#define	GFX_18BIT_MODE
 
     /// Avoid overflow and underflow remapping

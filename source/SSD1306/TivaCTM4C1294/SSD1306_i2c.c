@@ -10,7 +10,7 @@
 
 /// Middleware
 #include <I2C/DriverI2C.h>
-#include <I2C/DriverI2C_config.h>
+#include <I2C/TivaCTM4C1294/DriverI2C_config.h>
 
 /// Private attributes
 static int8_t   i2c_fd = (-1);

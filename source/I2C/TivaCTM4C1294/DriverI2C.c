@@ -2,7 +2,7 @@
 //  requires a compilation environment that includes
 //  the directory "include/"
 #include <I2C/DriverI2C.h>
-#include <I2C/DriverI2C_config.h>
+#include <I2C/TivaCTM4C1294/DriverI2C_config.h>
 
 #include <inc/hw_i2c.h>
 #include <inc/hw_ints.h>
@@ -58,7 +58,7 @@ void DriverI2C_init(void){
 }
 ///	Acquire a file descriptor for i2c
 int DriverI2C_open( unsigned int i2c_device ){
-    if( i2c_device >= EK_TM4C1294XL_I2CCOUNT ){
+    if( i2c_device >= TM4C1294XL_I2CCOUNT ){
         return DriverI2C_ERROR;
     }
     ROM_I2CMasterInitExpClk( DriverI2C_devices[ i2c_device ], SYSTEM_CLOCK , false );
@@ -70,7 +70,7 @@ int DriverI2C_open( unsigned int i2c_device ){
 	return (int8_t)i2c_device;
 }
 int DriverI2C_ioctl( int fd , unsigned int config , void* buffer ){
-    if( fd >= EK_TM4C1294XL_I2CCOUNT){
+    if( fd >= TM4C1294XL_I2CCOUNT){
         return DriverI2C_ERROR;
     }
     switch( DriverI2C_IOCTL_CMD_MASK & config ){
@@ -157,7 +157,7 @@ int DriverI2C_ioctl( int fd , unsigned int config , void* buffer ){
 }
 ///	Release a file descriptor for i2c
 void DriverI2C_close( int fd ){
-    if( fd >= EK_TM4C1294XL_I2CCOUNT ){
+    if( fd >= TM4C1294XL_I2CCOUNT ){
         return;///< Nothing to do
     }
     ROM_I2CMasterDisable( DriverI2C_devices[ fd ] );
@@ -177,7 +177,7 @@ int DriverI2C_write( int fd, const void* buffer, unsigned int size ){
 	if( !buffer || !size ){///< No buffer , size too small
 		return DriverI2C_ERROR;
 	}
-    if( fd >= EK_TM4C1294XL_I2CCOUNT ){
+    if( fd >= TM4C1294XL_I2CCOUNT ){
         return DriverI2C_ERROR;
     }
 
@@ -234,7 +234,7 @@ int DriverI2C_read( int fd, void* buffer, unsigned int size ){
     if( !buffer || !size  ){///< No buffer , size too small
         return DriverI2C_ERROR;
     }
-    if( fd >= EK_TM4C1294XL_I2CCOUNT ){
+    if( fd >= TM4C1294XL_I2CCOUNT ){
         return DriverI2C_ERROR;
     }
 

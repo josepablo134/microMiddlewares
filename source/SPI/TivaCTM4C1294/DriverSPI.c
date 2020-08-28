@@ -2,7 +2,7 @@
 //  requires a compilation environment that includes
 //  the directory "include/"
 #include <SPI/DriverSPI.h>
-#include <SPI/DriverSPI_config.h>
+#include <SPI/TivaCTM4C1294/DriverSPI_config.h>
 
 #include <inc/hw_ssi.h>
 #include <inc/hw_ints.h>
