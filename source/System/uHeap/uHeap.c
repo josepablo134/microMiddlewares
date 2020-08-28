@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include "uHeap.h"
+#include <System/uHeap/uHeap.h>
 
 #define HEAP_STRUCT_SIZE	sizeof(struct uheap)
 #define MIN_SIZE			HEAP_STRUCT_SIZE

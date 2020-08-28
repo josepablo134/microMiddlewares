@@ -45,10 +45,10 @@ void DriverI2C_init(void){
      * conflict before running your the application.
      */
     /* Configure the appropriate pins to be I2C instead of GPIO. */
-    ROM_GPIOPinConfigure(GPIO_PD0_I2C7SCL);
-    ROM_GPIOPinConfigure(GPIO_PD1_I2C7SDA);
-    ROM_GPIOPinTypeI2CSCL(GPIO_PORTD_BASE, GPIO_PIN_0);
-    ROM_GPIOPinTypeI2C(GPIO_PORTD_BASE, GPIO_PIN_1);
+//    ROM_GPIOPinConfigure(GPIO_PD0_I2C7SCL);
+//    ROM_GPIOPinConfigure(GPIO_PD1_I2C7SDA);
+//    ROM_GPIOPinTypeI2CSCL(GPIO_PORTD_BASE, GPIO_PIN_0);
+//    ROM_GPIOPinTypeI2C(GPIO_PORTD_BASE, GPIO_PIN_1);
 
     /* Configure the appropriate pins to be I2C instead of GPIO. */
     ROM_GPIOPinConfigure(GPIO_PA2_I2C8SCL);

@@ -4,7 +4,7 @@ A minimalist dynamic memory system
 
 ## Example of use
 
-```
+```c
 	unsigned char heap_buffer[ USER_DEFINED_MAX_HEAP_SIZE ];
 	struct uheap* heap;
 	float *a,*b;
