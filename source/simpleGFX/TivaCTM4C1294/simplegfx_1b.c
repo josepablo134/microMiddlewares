@@ -5,18 +5,16 @@
 #include <DEBUG.h>
 #include <stdlib.h>
 
-#ifdef	GFX_1BIT_MODE
+#if defined	( GFX_1BIT_MODE )|| ( GFX_MULTIMODE_ENABLED )
 
 #define GFX_BITS_PER_PAGE           8
 #define GFX_BITS_PER_COLUMN         1
 
-void gfx_drawPixel( struct framebuffer_t* fb , uint16_t x , uint16_t y , uint32_t value ){
-	ASSERT( fb == 0x00 );
-	ASSERT( fb->buffer == 0x00 );
-	ASSERT( fb->width == 0x00 );
-	ASSERT( fb->heigth == 0x00 );
-	ASSERT( fb->pages == 0x00 );
-	ASSERT( fb->columns == 0x00 );
+void gfx_drawPixel_1bit( struct framebuffer_t* fb , uint16_t x , uint16_t y , uint32_t value ){
+	ASSERT( fb != 0x00 );
+	ASSERT( fb->buffer != 0x00 );
+	ASSERT( fb->width != 0x00 );
+	ASSERT( fb->height != 0x00 );
 
 	#ifdef GFX_AVOID_OVERFLOW_REMAPPING
 		if( (x > fb->width) || (y > fb->height) ){
@@ -40,9 +38,9 @@ void gfx_drawPixel( struct framebuffer_t* fb , uint16_t x , uint16_t y , uint32_
 	*pvPage = (value)? *pvPage | val : *pvPage & ~val;
 }
 
-void gfx_fillScreen( struct framebuffer_t* fb , uint32_t value ){
-	ASSERT( fb == 0x00 );
-	ASSERT( fb->buffer == 0x00 );
+void gfx_fillScreen_1bit( struct framebuffer_t* fb , uint32_t value ){
+	ASSERT( fb != 0x00 );
+	ASSERT( fb->buffer != 0x00 );
 	uint8_t		val = ((uint8_t)value) * (0xFF);
 
 	uint8_t		*pvStart = fb->buffer;
@@ -55,7 +53,7 @@ void gfx_fillScreen( struct framebuffer_t* fb , uint32_t value ){
 	}
 }
 
-void gfx_drawBitmap( struct framebuffer_t* fb, uint16_t x, uint16_t y,
+void gfx_drawBitmap_1bit( struct framebuffer_t* fb, uint16_t x, uint16_t y,
 					 const uint8_t bitmap[], uint16_t w, uint16_t h, uint32_t value ) {
 	if( !bitmap ){ return; }
 	int16_t byteWidth = (w + 7) / 8; // Bitmap scanline pad = whole byte

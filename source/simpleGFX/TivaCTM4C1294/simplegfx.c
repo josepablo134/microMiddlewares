@@ -11,6 +11,10 @@ void gfx_init( struct framebuffer_t* fb ){
 	fb->buffLength = 0x00;
 	fb->height = 0x00;
 	fb->width = 0x00;
+
+    #ifdef GFX_MULTIMODE_ENABLED
+	fb->mode = GFX_MODE_1B;
+    #endif
 }
 
 void gfx_merge( struct framebuffer_t* fbDest , struct framebuffer_t* fbA , struct framebuffer_t* fbB ){

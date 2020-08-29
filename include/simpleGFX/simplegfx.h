@@ -10,17 +10,6 @@
     #include <stdint.h>
     #include <simpleGFX/simplegfx_config.h>
 
-    /*
-    *   Type of framebuffer depends on implementation of
-    *   display.
-    **/
-
-    struct framebuffer_t{
-                uint32_t    buffLength;
-                uint16_t    height,width;
-                uint8_t     *buffer;
-    };
-
     extern void gfx_init( struct framebuffer_t* fb );
 
 	extern void gfx_fillScreen( struct framebuffer_t* fb , uint32_t value );
