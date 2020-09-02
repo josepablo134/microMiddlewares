@@ -5,8 +5,238 @@
    	extern "C"
     {
 #endif
+		
+		/// This code was taken from : https://github.com/electricimp/MCP2515
+		///	and converted to C code
 	
+        #define MCP2515_TX_BUFF_0_CTRL_REG				0x30
+		#define MCP2515_TX_BUFF_1_CTRL_REG				0x40
+		#define MCP2515_TX_BUFF_2_CTRL_REG				0x50
+
+        #define MCP2515_TX_BUFF_ID_HIGH_EXIDE           0x08
+        #define MCP2515_TX_BUFF_DLC_RTR                 0x40
+
+		#define MCP2515_TX_RTS_CTRL_STAT_REG			0x0D
+
+		#define MCP2515_TX_BUFF_0_STAND_ID_HIGH			0x31
+		#define MCP2515_TX_BUFF_1_STAND_ID_HIGH			0x41
+		#define MCP2515_TX_BUFF_2_STAND_ID_HIGH			0x51
+
+		#define MCP2515_TX_BUFF_0_STAND_ID_LOW			0x32
+		#define MCP2515_TX_BUFF_1_STAND_ID_LOW			0x42
+		#define MCP2515_TX_BUFF_2_STAND_ID_LOW			0x52
+
+		#define MCP2515_TX_BUFF_0_EXTEND_ID_HIGH		0x33
+		#define MCP2515_TX_BUFF_1_EXTEND_ID_HIGH		0x43
+		#define MCP2515_TX_BUFF_2_EXTEND_ID_HIGH		0x53
+
+		#define MCP2515_TX_BUFF_0_EXTEND_ID_LOW			0x34
+		#define MCP2515_TX_BUFF_1_EXTEND_ID_LOW			0x44
+		#define MCP2515_TX_BUFF_2_EXTEND_ID_LOW			0x54
+
+		#define MCP2515_TX_BUFF_0_DATA_LEN_CODE			0x35
+		#define MCP2515_TX_BUFF_1_DATA_LEN_CODE			0x45
+		#define MCP2515_TX_BUFF_2_DATA_LEN_CODE			0x55
+
+		#define MCP2515_TX_BUFF_0_DATA_BYTE_0			0x36
+		#define MCP2515_TX_BUFF_0_DATA_BYTE_1			0x37
+		#define MCP2515_TX_BUFF_0_DATA_BYTE_2			0x38
+		#define MCP2515_TX_BUFF_0_DATA_BYTE_3			0x39
+		#define MCP2515_TX_BUFF_0_DATA_BYTE_4			0x3A
+		#define MCP2515_TX_BUFF_0_DATA_BYTE_5			0x3B
+		#define MCP2515_TX_BUFF_0_DATA_BYTE_6			0x3C
+		#define MCP2515_TX_BUFF_0_DATA_BYTE_7			0x3D
+
+		#define MCP2515_TX_BUFF_1_DATA_BYTE_0			0x46
+		#define MCP2515_TX_BUFF_1_DATA_BYTE_1			0x47
+		#define MCP2515_TX_BUFF_1_DATA_BYTE_2			0x48
+		#define MCP2515_TX_BUFF_1_DATA_BYTE_3			0x49
+		#define MCP2515_TX_BUFF_1_DATA_BYTE_4			0x4A
+		#define MCP2515_TX_BUFF_1_DATA_BYTE_5			0x4B
+		#define MCP2515_TX_BUFF_1_DATA_BYTE_6			0x4C
+		#define MCP2515_TX_BUFF_1_DATA_BYTE_7			0x4D
+
+		#define MCP2515_TX_BUFF_2_DATA_BYTE_0			0x56
+		#define MCP2515_TX_BUFF_2_DATA_BYTE_1			0x57
+		#define MCP2515_TX_BUFF_2_DATA_BYTE_2			0x58
+		#define MCP2515_TX_BUFF_2_DATA_BYTE_3			0x59
+		#define MCP2515_TX_BUFF_2_DATA_BYTE_4			0x5A
+		#define MCP2515_TX_BUFF_2_DATA_BYTE_5			0x5B
+		#define MCP2515_TX_BUFF_2_DATA_BYTE_6			0x5C
+		#define MCP2515_TX_BUFF_2_DATA_BYTE_7			0x5D
+
+		#define MCP2515_RX_BUFF_0_CTRL_REG				0x60
+		#define MCP2515_RX_BUFF_1_CTRL_REG				0x70
+
+        #define MCP2515_RX_BUFF_ID_LOW_SRR              0x10
+        #define MCP2515_RX_BUFF_ID_LOW_IDE              0x08
+        #define MCP2515_RX_DLC_RTR                      0x40
+
+		#define MCP2515_RX_BUFF_CTRL_STAT_REG			0x0C
+
+		#define MCP2515_RX_BUFF_0_STAND_ID_HIGH			0x61
+		#define MCP2515_RX_BUFF_1_STAND_ID_HIGH			0x71
+
+		#define MCP2515_RX_BUFF_0_STAND_ID_LOW			0x62
+		#define MCP2515_RX_BUFF_1_STAND_ID_LOW			0x72
+
+		#define MCP2515_RX_BUFF_0_EXTEND_ID_HIGH		0x63
+		#define MCP2515_RX_BUFF_1_EXTEND_ID_HIGH		0x73
+
+		#define MCP2515_RX_BUFF_0_EXTEND_ID_LOW			0x64
+		#define MCP2515_RX_BUFF_1_EXTEND_ID_LOW			0x74
+
+		#define MCP2515_RX_BUFF_0_DATA_LEN_CODE			0x65
+		#define MCP2515_RX_BUFF_1_DATA_LEN_CODE			0x75
+
+		#define MCP2515_RX_BUFF_0_DATA_BYTE_0			0x66
+		#define MCP2515_RX_BUFF_0_DATA_BYTE_1			0x67
+		#define MCP2515_RX_BUFF_0_DATA_BYTE_2			0x68
+		#define MCP2515_RX_BUFF_0_DATA_BYTE_3			0x69
+		#define MCP2515_RX_BUFF_0_DATA_BYTE_4			0x6A
+		#define MCP2515_RX_BUFF_0_DATA_BYTE_5			0x6B
+		#define MCP2515_RX_BUFF_0_DATA_BYTE_6			0x6C
+		#define MCP2515_RX_BUFF_0_DATA_BYTE_7			0x6D
+
+		#define MCP2515_RX_BUFF_1_DATA_BYTE_0			0x76
+		#define MCP2515_RX_BUFF_1_DATA_BYTE_1			0x77
+		#define MCP2515_RX_BUFF_1_DATA_BYTE_2			0x78
+		#define MCP2515_RX_BUFF_1_DATA_BYTE_3			0x79
+		#define MCP2515_RX_BUFF_1_DATA_BYTE_4			0x7A
+		#define MCP2515_RX_BUFF_1_DATA_BYTE_5			0x7B
+		#define MCP2515_RX_BUFF_1_DATA_BYTE_6			0x7C
+		#define MCP2515_RX_BUFF_1_DATA_BYTE_7			0x7D
+
+		#define MCP2515_RX_FILTER_0_STAND_ID_HIGH		0x00
+		#define MCP2515_RX_FILTER_1_STAND_ID_HIGH		0x04
+		#define MCP2515_RX_FILTER_2_STAND_ID_HIGH		0x08
+		#define MCP2515_RX_FILTER_3_STAND_ID_HIGH		0x10
+		#define MCP2515_RX_FILTER_4_STAND_ID_HIGH		0x14
+		#define MCP2515_RX_FILTER_5_STAND_ID_HIGH		0x18
+
+		#define MCP2515_RX_FILTER_0_STAND_ID_LOW		0x01
+		#define MCP2515_RX_FILTER_1_STAND_ID_LOW		0x05
+		#define MCP2515_RX_FILTER_2_STAND_ID_LOW		0x09
+		#define MCP2515_RX_FILTER_3_STAND_ID_LOW		0x11
+		#define MCP2515_RX_FILTER_4_STAND_ID_LOW		0x15
+		#define MCP2515_RX_FILTER_5_STAND_ID_LOW		0x19
+
+		#define MCP2515_RX_FILTER_0_EXTEND_ID_HIGH		0x02
+		#define MCP2515_RX_FILTER_1_EXTEND_ID_HIGH		0x06
+		#define MCP2515_RX_FILTER_2_EXTEND_ID_HIGH		0x0A
+		#define MCP2515_RX_FILTER_3_EXTEND_ID_HIGH		0x12
+		#define MCP2515_RX_FILTER_4_EXTEND_ID_HIGH		0x16
+		#define MCP2515_RX_FILTER_5_EXTEND_ID_HIGH		0x1A
+
+		#define MCP2515_RX_FILTER_0_EXTEND_ID_LOW		0x03
+		#define MCP2515_RX_FILTER_1_EXTEND_ID_LOW		0x07
+		#define MCP2515_RX_FILTER_2_EXTEND_ID_LOW		0x0B
+		#define MCP2515_RX_FILTER_3_EXTEND_ID_LOW		0x13
+		#define MCP2515_RX_FILTER_4_EXTEND_ID_LOW		0x17
+		#define MCP2515_RX_FILTER_5_EXTEND_ID_LOW		0x1B
+
+		#define MCP2515_RX_MASK_0_STAND_ID_HIGH			0x20
+		#define MCP2515_RX_MASK_1_STAND_ID_HIGH			0x24
+
+		#define MCP2515_RX_MASK_0_STAND_ID_LOW			0x21
+		#define MCP2515_RX_MASK_1_STAND_ID_LOW			0x25
+
+		#define MCP2515_RX_MASK_0_EXTEND_ID_HIGH		0x22
+		#define MCP2515_RX_MASK_1_EXTEND_ID_HIGH		0x26
+
+		#define MCP2515_RX_MASK_0_EXTEND_ID_LOW			0x23
+		#define MCP2515_RX_MASK_1_EXTEND_ID_LOW			0x27
+
+		#define MCP2515_CONFIG_REG_1					0x2A
+		#define MCP2515_CONFIG_REG_2					0x29
+		#define MCP2515_CONFIG_REG_3					0x28
+
+		#define MCP2515_TX_ERROR_COUNT_REG				0x1C
+		#define MCP2515_RX_ERROR_COUNT_REG				0x1D
+		#define MCP2515_ERROR_FLAG_REG					0x2D
+
+		#define MCP2515_CAN_INT_EN_REG					0x2B
+		#define MCP2515_CAN_INT_FLAG_REG				0x2C
+
+		#define MCP2515_CAN_CTRL_REG					0x0F
+		#define MCP2515_CAN_STATUS_REG					0x0E
+
+
+		// SPI Instructions
+		#define MCP2515_CMD_RESET						0xC0
+		#define MCP2515_CMD_READ 						0x03
+		#define MCP2515_CMD_WRITE						0x02
+		#define MCP2515_CMD_READ_STATUS					0xA0
+		#define MCP2515_CMD_RX_STATUS					0xB0
+		#define MCP2515_CMD_BIT_MODIFY					0x05
+		#define MCP2515_CMD_READ_RX_BUFF_0				0x90
+		#define MCP2515_CMD_READ_RX_BUFF_1				0x94
+		#define MCP2515_CMD_LOAD_TX_BUFF_0				0x40
+		#define MCP2515_CMD_LOAD_TX_BUFF_1				0x42
+		#define MCP2515_CMD_LOAD_TX_BUFF_2				0x44
+		#define MCP2515_CMD_RTS_TX_0					0x81
+		#define MCP2515_CMD_RTS_TX_1					0x82
+		#define MCP2515_CMD_RTS_TX_2					0x84
+		#define MCP2515_CMD_RTS_TX_ALL					0x87
+
+		// Modes of Operation
+		#define MCP2515_OP_MODE_MASK					0xE0
+		#define MCP2515_OP_MODE_NORMAL					0x00
+		#define MCP2515_OP_MODE_SLEEP					0x20
+		#define MCP2515_OP_MODE_LOOPBACK				0x40
+		#define MCP2515_OP_MODE_LISTEN_ONLY				0x60
+		#define MCP2515_OP_MODE_CONFIG					0x80
+		#define MCP2515_OP_MODE_POWERUP					0xE0
+
+		// Defualt timing settings (10Mhz clock, 1Mbit speed)
+		#define MCP2515_INIT_DEFAULT_BRP				0x01
+		#define MCP2515_INIT_DEFAULT_PROP_SEG		 	0x01
+		#define MCP2515_INIT_DEFAULT_PHASE_SEG_1 	 	0x01
+		#define MCP2515_INIT_DEFAULT_PHASE_SEG_2 	 	0x02
+		#define MCP2515_INIT_DEFAULT_SJW				0x01
+
+		// Settings
+		#define MCP2515_SAM_1X							0x00
+		#define MCP2515_SAM_3X							0x40
+
+   	    /// One-shot mode
+   	    #define MCP2515_OSM_MASK                        0x08
+        #define MCP2515_OSM_ENABLED                     0x08
+        #define MCP2515_OSM_DISABLED                    0x00
+
+        /// Abort all pending transmissions
+        #define MCP2515_ABAT_MASK                        0x10
+        #define MCP2515_ABAT_ENABLED                     0x10
+        #define MCP2515_ABAT_DISABLED                    0x00
+
+		// Interrupt settings
+		#define MCP2515_DISABLE_ALL_INTS				0x00
+		#define MCP2515_EN_INT_RXB0						0x01
+		#define MCP2515_EN_INT_RXB1						0x02
+		#define MCP2515_EN_INT_TXB0						0x04
+		#define MCP2515_EN_INT_TXB1						0x08
+		#define MCP2515_EN_INT_TXB2						0x10
+		#define MCP2515_EN_INT_ERR						0x20
+		#define MCP2515_EN_INT_WAKE						0x40
+		#define MCP2515_EN_INT_MSG_ERR					0x80
+
+		// RX Pin settings
+		#define MCP2515_RXBF_PINS_DISABLE				0x00
+		#define MCP2515_RX0BF_PIN_EN_INT				0x05
+		#define MCP2515_RX0BF_PIN_EN_DIG_OUT_HIGH		0x14
+		#define MCP2515_RX0BF_PIN_EN_DIG_OUT_LOW		0x04
+		#define MCP2515_RX1BF_PIN_EN_INT				0x0A
+		#define MCP2515_RX1BF_PIN_EN_DIG_OUT_HIGH		0x18
+		#define MCP2515_RX1BF_PIN_EN_DIG_OUT_LOW		0x08
+
+		// TX Pin settings
+		#define MCP2515_TXRTS_PINS_DIG_IN				0x00
+		#define MCP2515_TX0RTS_PIN_RTS					0x01
+		#define MCP2515_TX1RTS_PIN_RTS					0x02
+		#define MCP2515_TX2RTS_PIN_RTS					0x04
 	
+    #define MCP2515_MAX_FRAME_DATA_LENGTH       0x08
+
 #ifdef __cplusplus
 	}
 #endif

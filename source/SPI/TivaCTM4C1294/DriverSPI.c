@@ -125,13 +125,11 @@ int DriverSPI_write( int fd, const void* buffer, unsigned int size){
     uint32_t dummy;
     for( counter=0; counter < size; counter++ ){
         SSIDataPut( periph_base , pvBuffer[counter] );/// TivaWare specifies that this is a blocking mode
-        while (SSIBusy(periph_base)){}
-        SSIDataGet( periph_base , &dummy );
     }
 
-//    /// Flush RX FIFO
-//    while (SSIBusy(periph_base)){}
-//    while( SSIDataGetNonBlocking( periph_base , &dummy) ){}
+    /// Flush RX FIFO
+    while (SSIBusy(periph_base)){}
+    while( SSIDataGetNonBlocking( periph_base , &dummy) ){}
 
     return counter;
 }

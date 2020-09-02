@@ -17,7 +17,7 @@
     #define DriverSPI_IOCTL_CMD_MASK                0xFFFFFF00
 
     /// This is not a IOCTL command
-    #define DriverSPI_IOCTL_DATA_MASK             (~0xFFFFFF00)
+    #define DriverSPI_IOCTL_DATA_MASK             (~DriverSPI_IOCTL_CMD_MASK)
 
     /// Configure the SPI mode
     //  Requires a struct DriverSPI_mode
