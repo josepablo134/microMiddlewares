@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include <System/uHeap/uHeap.h>
+#include "uHeap.h"
 
 #define HEAP_STRUCT_SIZE	sizeof(struct uheap)
 #define MIN_SIZE			HEAP_STRUCT_SIZE
@@ -20,6 +20,7 @@ struct uheap* uheap_init( uint8_t* heap_buffer , uint16_t heap_size ){
 
 uint8_t*	uheap_malloc( struct uheap* heap_t,  uint16_t size ){
 	if(!heap_t){return 0x00;}
+	if(!size ){return 0x00;}
 	if( heap_t->free < size ){return 0x00;}
 
 	///	First approach is to increment the pointer and return
@@ -28,6 +29,7 @@ uint8_t*	uheap_malloc( struct uheap* heap_t,  uint16_t size ){
 	///	Updating heap metadata
 	heap_t->free -= size;
 
-	///	Create a new entry
-	return heap_t->heap_bytes + (heap_t->length - heap_t->free);
+	uint8_t*	vptr = heap_t->heap_bytes;
+	heap_t->heap_bytes += size;
+	return vptr;
 }
