@@ -1,3 +1,10 @@
+/*!
+*	@file		DriverI2C.c
+*	@version	0.0
+*	@author		Josepablo Cruz Baas
+*	@date		08/26/2020
+*	@brief		TivaC TM4C1294 specific implementation
+**/
 /// Include Middleware description
 //  requires a compilation environment that includes
 //  the directory "include/"

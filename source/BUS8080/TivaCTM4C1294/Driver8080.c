@@ -1,3 +1,10 @@
+/*!
+*	@file		Driver8080.c
+*	@version	0.0
+*	@author		Josepablo Cruz Baas
+*	@date		08/26/2020
+*	@brief		TivaC TM4C1294 specific implementation
+**/
 #include <BUS8080/Driver8080.h>
 /// Dependencias locales
 #include <stdbool.h>
