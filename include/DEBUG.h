@@ -13,7 +13,7 @@ extern void __error__(void);
                      {                                                        \
                          if(!(expr))                                          \
                          {                                                    \
-                             __error__(void);                                 \
+                             __error__();                                     \
                          }                                                    \
                      }                                                        \
                      while(0)
