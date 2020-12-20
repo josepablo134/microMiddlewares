@@ -132,7 +132,7 @@ int MCP2515_ioctl( int fd , unsigned int config , void* buffer ){
 ///	Send a new package
 int MCP2515_write( int fd , const void* buffer, unsigned int size ){
     if(! buffer ){return-1;}
-    if( size < sizeof(struct MCP2515_can_frame) ){return -1;}
+    if( size != sizeof(struct MCP2515_can_frame) ){return -1;}
     struct MCP2515_can_frame *frm = (struct MCP2515_can_frame*) buffer;
 
     if(frm->can_dlc >= MCP2515_MAX_FRAME_DATA_LENGTH){ return -1; }
@@ -197,7 +197,7 @@ int MCP2515_write( int fd , const void* buffer, unsigned int size ){
 ///	Read any available package
 int MCP2515_read( int fd , void* buffer, unsigned int size ){
     if(! buffer ){return-1;}
-    if( size < sizeof(struct MCP2515_can_frame) ){return -1;}
+    if( size != sizeof(struct MCP2515_can_frame) ){return -1;}
     struct MCP2515_can_frame *frm = (struct MCP2515_can_frame*) buffer;
 
     int rdCounter;
@@ -207,7 +207,7 @@ int MCP2515_read( int fd , void* buffer, unsigned int size ){
             mcp_read_instruction = MCP2515_CMD_READ_RX_BUFF_0;
             break;
         case MCP2515_rxbuff1:
-            mcp_read_instruction = MCP2515_CMD_READ_RX_BUFF_0;
+            mcp_read_instruction = MCP2515_CMD_READ_RX_BUFF_1;
             break;
         default:
             return -1;

@@ -186,7 +186,6 @@
 		#define MCP2515_OP_MODE_LOOPBACK				0x40
 		#define MCP2515_OP_MODE_LISTEN_ONLY				0x60
 		#define MCP2515_OP_MODE_CONFIG					0x80
-		#define MCP2515_OP_MODE_POWERUP					0xE0
 
 		// Defualt timing settings (10Mhz clock, 1Mbit speed)
 		#define MCP2515_INIT_DEFAULT_BRP				0x01
