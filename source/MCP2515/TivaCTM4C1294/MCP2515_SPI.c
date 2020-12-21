@@ -135,7 +135,7 @@ int MCP2515_write( int fd , const void* buffer, unsigned int size ){
     if( size != sizeof(struct MCP2515_can_frame) ){return -1;}
     struct MCP2515_can_frame *frm = (struct MCP2515_can_frame*) buffer;
 
-    if(frm->can_dlc >= MCP2515_MAX_FRAME_DATA_LENGTH){ return -1; }
+    if(frm->can_dlc > MCP2515_MAX_FRAME_DATA_LENGTH){ return -1; }
 
     int wrCounter;
     uint8_t mcp_load_instruction;
@@ -229,6 +229,7 @@ int MCP2515_read( int fd , void* buffer, unsigned int size ){
         /// CAN ID Needs reorder
 
         /// Setting Standard CAN ID
+        frm->can_id.ID = 0x00;
         frm->can_id.CAN_ID_STD = ((uint16_t)canId[0])<<3;
         frm->can_id.CAN_ID_STD |= canId[1]>>5;
 
@@ -251,10 +252,10 @@ int MCP2515_read( int fd , void* buffer, unsigned int size ){
         }
 
         /// Set Data Length Code
-        frm->can_dlc = canId[4] & 0x0F;
+        frm->can_dlc = canId[4] & 0x1F;
 
         /// Validate Data Length Code
-        if(frm->can_dlc >= MCP2515_MAX_FRAME_DATA_LENGTH){
+        if(frm->can_dlc > MCP2515_MAX_FRAME_DATA_LENGTH){
             SPI_DISABLE;
             return -1;
         }
