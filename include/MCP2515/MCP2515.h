@@ -54,8 +54,8 @@
             unsigned    CAN_ID_EFF:1;/// Extended Frame Format, bits (31)
         };
         struct {
-            unsigned    CAN_ID_STD:11;///bits (0 .. 10)
             unsigned    CAN_ID_EXT:18;///bits (10 .. 17)
+            unsigned    CAN_ID_STD:11;///bits (0 .. 10)
         };
         uint32_t    ID;/// Raw CAN ID code
     }MCP2515_can_id_t;

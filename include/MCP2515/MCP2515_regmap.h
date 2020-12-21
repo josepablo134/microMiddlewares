@@ -66,6 +66,9 @@
 		#define MCP2515_TX_BUFF_2_DATA_BYTE_7			0x5D
 
 		#define MCP2515_RX_BUFF_0_CTRL_REG				0x60
+        #define MCP2515_RX_BUFF_0_CTRL_MASK             0x64
+        #define MCP2515_RX_BUFF_0_CTRL_RECV_ANY         0x60
+        #define MCP2515_RX_BUFF_0_CTRL_BUKT             0x04
 		#define MCP2515_RX_BUFF_1_CTRL_REG				0x70
 
         #define MCP2515_RX_BUFF_ID_LOW_SRR              0x10
