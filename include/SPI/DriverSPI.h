@@ -47,6 +47,12 @@
     #define DriverSPI_SPI_MODE_PHA_0                0x00
     #define DriverSPI_SPI_MODE_PHA_1                0x01
 
+    /// Configure the SPI Frame mode
+    //  frame mode is set as a bit OR operation to this flag
+    #define DriverSPI_IOCTL_CONF_FRAME_MODE         0x00000200
+    #define DriverSPI_IOCTL_CONF_FRAME_NORMAL       0x00
+    #define DriverSPI_IOCTL_CONF_FRAME_PARTITION    0x01
+
     struct DriverSPI_mode{
         uint32_t    bitrate;
         uint8_t     polarity;/// DriverSPI_SPI_MODE_POL_{0,1}

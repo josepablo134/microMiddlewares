@@ -22,6 +22,11 @@
 #define void_DriverSPI_ASSERT_FD( FD ){  if( FD >= TM4C1294XL_SPICOUNT ){ return; } }
 
 void DriverSPI_init(void){
+    /// Clear all SPI devices flags
+    uint8_t device;
+    for( device = 0; device < TM4C1294XL_SPICOUNT ; device ++ ){
+        DriverSPI_flags[ device ] = 0x00;
+    }
     ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);
     ROM_SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOQ);
     /* SSI2 */
@@ -67,10 +72,11 @@ int DriverSPI_open( unsigned int spi_device){
     ROM_SSIConfigSetExpClk( periph_base , SYSTEM_CLOCK ,
                         SSI_FRF_MOTO_MODE_0 , SSI_MODE_MASTER ,
                         DriverSPI_DEFAULT_BITRATE , 8 );
+    ROM_SSIAdvModeSet( periph_base, SSI_ADV_MODE_READ_WRITE );
+    ROM_SSIAdvFrameHoldEnable( periph_base );
     ROM_SSIIntClear( periph_base , 0x7F );
     ROM_SSIIntDisable( periph_base , 0x7F );
     ROM_SSIEnable( periph_base );
-
     return spi_device;
 }
 
@@ -100,9 +106,19 @@ int DriverSPI_ioctl( int fd , unsigned int config , void* buffer ){
             ROM_SSIConfigSetExpClk( periph_base , SYSTEM_CLOCK ,
                                     pol_phase_mode , SSI_MODE_MASTER ,
                                     mode->bitrate , 8 );
+            ROM_SSIAdvModeSet( periph_base, SSI_ADV_MODE_READ_WRITE );
+            ROM_SSIAdvFrameHoldEnable( periph_base );
             ROM_SSIIntClear( periph_base , 0x7F );
             ROM_SSIIntDisable( periph_base , 0x7F );
             ROM_SSIEnable( periph_base );
+            return 0;
+        }
+        case DriverSPI_IOCTL_CONF_FRAME_MODE:
+        {
+            DriverSPI_flags[ fd ] &= (uint8_t) ~( DriverSPI_MODE_MASK );/// Clear actual mode
+            if( DriverSPI_MODE_FRAME_PARTITION == ( config & 0xFF ) ){
+                DriverSPI_flags[ fd ] |= DriverSPI_MODE_FRAME_PARTITION;/// Set frame partition mode
+            }/// Normal mode is equal to clear flag.
             return 0;
         }
     }
@@ -123,14 +139,29 @@ int DriverSPI_write( int fd, const void* buffer, unsigned int size){
     uint8_t*    pvBuffer = (uint8_t*)buffer;
     unsigned int counter;
     uint32_t dummy;
-    for( counter=0; counter < size; counter++ ){
-        SSIDataPut( periph_base , pvBuffer[counter] );/// TivaWare specifies that this is a blocking mode
+
+    if(  DriverSPI_MODE_FRAME_NORMAL == ( DriverSPI_flags[ fd ] & DriverSPI_MODE_MASK )  ){
+        size--;// Size is atleast 1, this could lead to size = 0 in the worse case.
+        for( counter=0; counter < size; counter++ ){
+            SSIDataPut( periph_base , pvBuffer[counter] );/// TivaWare specifies that this is a blocking mode
+        }
+        /* *
+         * Send this byte as the end of the frame,
+         * this leads to releasing the CS pin
+         * */
+        SSIAdvDataPutFrameEnd( periph_base , pvBuffer[counter] );
+        /// Flush RX FIFO
+        while (SSIBusy(periph_base)){}
+    }else{
+        /* *
+         * Send data without releasing the CS pin,
+         * that will be done in future transactions
+         *  */
+        for( counter=0; counter < size; counter++ ){
+            SSIDataPut( periph_base , pvBuffer[counter] );/// TivaWare specifies that this is a blocking mode
+        }
     }
-
-    /// Flush RX FIFO
-    while (SSIBusy(periph_base)){}
-    while( SSIDataGetNonBlocking( periph_base , &dummy) ){}
-
+    while( SSIDataGetNonBlocking( periph_base , &dummy) ){}/// Flush FIFO
     return counter;
 }
 
@@ -145,12 +176,34 @@ int DriverSPI_read( int fd, void* buffer, unsigned int size){
     uint32_t    temp;
     unsigned int counter;
 
-    for( counter=0; counter < size; counter++ ){
-        SSIDataPut( periph_base , pvBuffer[counter] );
+    if(  DriverSPI_MODE_FRAME_NORMAL == ( DriverSPI_flags[ fd ] & DriverSPI_MODE_MASK )  ){
+        size--;// Size is atleast 1, this could lead to size = 0 in the worse case.
+        for( counter=0; counter < size; counter++ ){
+            SSIDataPut( periph_base , pvBuffer[counter] );
+            SSIDataGet( periph_base , &temp );
+            pvBuffer[counter] = (uint8_t)(0xFF & temp);
+            temp = 0x00;
+        }
+        /* *
+         * Send this byte as the end of the frame,
+         * this leads to releasing the CS pin.
+         * Then read the last byte at the RX buffer.
+         * */
+        SSIAdvDataPutFrameEnd( periph_base , pvBuffer[counter] );
         while (SSIBusy(periph_base)){}
         SSIDataGet( periph_base , &temp );
-        pvBuffer[counter] = (0xFF & temp);
-        temp = 0x00;
+        pvBuffer[counter] = (uint8_t)(0xFF & temp);
+    }else{
+        /* *
+         * Send/Receive data without releasing the CS pin,
+         * that will be done in future transactions
+         *  */
+        for( counter=0; counter < size; counter++ ){
+            SSIDataPut( periph_base , pvBuffer[counter] );/// TivaWare specifies that this is a blocking mode
+            SSIDataGet( periph_base , &temp );
+            pvBuffer[counter] = (0xFF & temp);
+            temp = 0x00;
+        }
     }
     return counter;
 }
