@@ -17,9 +17,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#define SPI_ENABLE      GPIOPinWrite( GPIO_PORTD_BASE , GPIO_PIN_2 , 0 )
-#define SPI_DISABLE     GPIOPinWrite( GPIO_PORTD_BASE , GPIO_PIN_2 , GPIO_PIN_2 )
-
 void MCP2515_init(void){
 	DriverSPI_init();
 }
@@ -40,11 +37,13 @@ int MCP2515_open(unsigned int device ){
     /// Setting SPI operation mode
     DriverSPI_ioctl( fd , DriverSPI_IOCTL_CONF_MODE , &mode );
 
+    /*
     /// Overwritte SPI_SS for GPIO MODE
     /// Manually control the GPIO SS/CS PIN
     GPIOPinTypeGPIOOutput(GPIO_PORTD_BASE, GPIO_PIN_2);
     GPIOPadConfigSet( GPIO_PORTD_BASE , GPIO_PIN_2 , GPIO_STRENGTH_12MA , GPIO_PIN_TYPE_STD );
     GPIOPinWrite( GPIO_PORTD_BASE , GPIO_PIN_2 , GPIO_PIN_2 );
+    */
 
 	return fd;
 }
@@ -52,23 +51,19 @@ int MCP2515_open(unsigned int device ){
 int MCP2515_ioctl( int fd , unsigned int config , void* buffer ){
     switch( config & MCP2515_IOCTL_CMD_MASK ){
         case MCP2515_IOCTL_RESET:{
-            SPI_ENABLE;
+            DriverSPI_ioctl( fd, DriverSPI_IOCTL_CONF_FRAME_MODE | DriverSPI_IOCTL_CONF_FRAME_NORMAL , 0x00 );
                 uint8_t rstCommand = MCP2515_CMD_RESET;
                 DriverSPI_write( fd, &rstCommand, 1);
-            SPI_DISABLE;
             return 0;
         }
         case MCP2515_IOCTL_WRITE_CMD:{
             if( !buffer ){ return -1; }
             struct MCP2515_command* cmd = (struct MCP2515_command*) buffer;
 
-            /// CS Enable
-            SPI_ENABLE;
-                DriverSPI_write( fd, &(cmd->cmd), cmd->cmdLen );
-                DriverSPI_write( fd, cmd->params, cmd->paramsLen);
-            /// CS Disable
-            SPI_DISABLE;
-
+            DriverSPI_ioctl( fd, DriverSPI_IOCTL_CONF_FRAME_MODE | DriverSPI_IOCTL_CONF_FRAME_PARTITION , 0x00 );
+            DriverSPI_write( fd, &(cmd->cmd), cmd->cmdLen );
+            DriverSPI_ioctl( fd, DriverSPI_IOCTL_CONF_FRAME_MODE | DriverSPI_IOCTL_CONF_FRAME_NORMAL , 0x00 );
+            DriverSPI_write( fd, cmd->params, cmd->paramsLen);
             return 0;
         }
         case MCP2515_IOCTL_READ_CMD:{
@@ -76,11 +71,10 @@ int MCP2515_ioctl( int fd , unsigned int config , void* buffer ){
             struct MCP2515_command* cmd = (struct MCP2515_command*) buffer;
 
             /// CS Enable
-            SPI_ENABLE;
-                DriverSPI_write( fd, &(cmd->cmd), cmd->cmdLen );
-                DriverSPI_read( fd, cmd->params, cmd->paramsLen);
-            /// CS Disable
-            SPI_DISABLE;
+            DriverSPI_ioctl( fd, DriverSPI_IOCTL_CONF_FRAME_MODE | DriverSPI_IOCTL_CONF_FRAME_PARTITION , 0x00 );
+            DriverSPI_write( fd, &(cmd->cmd), cmd->cmdLen );
+            DriverSPI_ioctl( fd, DriverSPI_IOCTL_CONF_FRAME_MODE | DriverSPI_IOCTL_CONF_FRAME_NORMAL , 0x00 );
+            DriverSPI_read( fd, cmd->params, cmd->paramsLen);
 
             return 0;
         }
@@ -102,11 +96,8 @@ int MCP2515_ioctl( int fd , unsigned int config , void* buffer ){
                     default:
                         return -1;
                 }
-            /// CS Enable
-            SPI_ENABLE;
-                DriverSPI_write( fd, &command, 1 );
-            /// CS Disable
-            SPI_DISABLE;
+            DriverSPI_ioctl( fd, DriverSPI_IOCTL_CONF_FRAME_MODE | DriverSPI_IOCTL_CONF_FRAME_NORMAL , 0x00 );
+            DriverSPI_write( fd, &command, 1 );
             return 0;
         }
         case MCP2515_IOCTL_ONE_SHOT_MODE:{
@@ -119,11 +110,8 @@ int MCP2515_ioctl( int fd , unsigned int config , void* buffer ){
             if( !(config & MCP2515_IOCTL_DATA_MASK) ){
                 command[3] = MCP2515_OSM_DISABLED;
             }
-            /// CS Enable
-            SPI_ENABLE;
-                DriverSPI_write( fd, command, sizeof(command) );
-            /// CS Disable
-            SPI_DISABLE;
+            DriverSPI_ioctl( fd, DriverSPI_IOCTL_CONF_FRAME_MODE | DriverSPI_IOCTL_CONF_FRAME_NORMAL , 0x00 );
+            DriverSPI_write( fd, command, sizeof(command) );
             return 0;
         }
     }
@@ -153,44 +141,44 @@ int MCP2515_write( int fd , const void* buffer, unsigned int size ){
             return -1;
     }
 
-    /// CS Enable
-    SPI_ENABLE;
-        /// Load Frame to send
-        wrCounter = DriverSPI_write( fd, &mcp_load_instruction, 1 );
+    /// Begin Frame
+    DriverSPI_ioctl( fd, DriverSPI_IOCTL_CONF_FRAME_MODE | DriverSPI_IOCTL_CONF_FRAME_PARTITION , 0x00 );
+    /// Load Frame to send
+    wrCounter = DriverSPI_write( fd, &mcp_load_instruction, 1 );
 
-        /// According with the datasheet, the load instruction
-        //  allows writing TX buffer in the next order:
-        //  IDH, IDL, ID8, ID0, DLC, D0..D7
-        uint8_t canId[4];
+    /// According with the datasheet, the load instruction
+    //  allows writing TX buffer in the next order:
+    //  IDH, IDL, ID8, ID0, DLC, D0..D7
+    uint8_t canId[4];
 
-            //  IDH -> Standard ID higher bits (10 .. 3) bit.
-            canId[0] = (frm->can_id.CAN_ID_STD)>>3;
+        //  IDH -> Standard ID higher bits (10 .. 3) bit.
+        canId[0] = (frm->can_id.CAN_ID_STD)>>3;
 
-            //  IDL -> Standard ID lower bits (2 .. 0) bits
-            canId[1] = (frm->can_id.CAN_ID_STD)<<5;
-            /// Extended frame format
-            if( frm->can_id.CAN_ID_EFF ){
-                canId[1] |= MCP2515_TX_BUFF_ID_HIGH_EXIDE;///Set EXIDE Flag
-            }
-            ///Set extended ID bits (17 .. 16) bits
-            canId[1] |= ( (frm->can_id.CAN_ID_EXT)>>16 ) & 0x3;
+        //  IDL -> Standard ID lower bits (2 .. 0) bits
+        canId[1] = (frm->can_id.CAN_ID_STD)<<5;
+        /// Extended frame format
+        if( frm->can_id.CAN_ID_EFF ){
+            canId[1] |= MCP2515_TX_BUFF_ID_HIGH_EXIDE;///Set EXIDE Flag
+        }
+        ///Set extended ID bits (17 .. 16) bits
+        canId[1] |= ( (frm->can_id.CAN_ID_EXT)>>16 ) & 0x3;
 
-            /// Set the rest of the Extended ID
-            canId[2] = (frm->can_id.CAN_ID_EXT>>8);//ID8
-            canId[3] = (frm->can_id.CAN_ID_EXT);//ID0
+        /// Set the rest of the Extended ID
+        canId[2] = (frm->can_id.CAN_ID_EXT>>8);//ID8
+        canId[3] = (frm->can_id.CAN_ID_EXT);//ID0
 
-        /// Send actual ID configuration
-        wrCounter += DriverSPI_write( fd, canId , sizeof(canId) );
+    /// Send actual ID configuration
+    wrCounter += DriverSPI_write( fd, canId , sizeof(canId) );
 
-        /// Configure Data Length Code Register
-        //  Set RTR bit if required
-        canId[0] = frm->can_dlc | ( frm->can_id.CAN_ID_RTR << 6 );
-        wrCounter += DriverSPI_write( fd, canId , 1 );
+    /// Configure Data Length Code Register
+    //  Set RTR bit if required
+    canId[0] = frm->can_dlc | ( frm->can_id.CAN_ID_RTR << 6 );
+    wrCounter += DriverSPI_write( fd, canId , 1 );
 
-        /// Send data bytes
-        wrCounter += DriverSPI_write( fd, frm->data , frm->can_dlc );
-    /// CS Disable
-    SPI_DISABLE;
+    /// Ending of the frame
+    DriverSPI_ioctl( fd, DriverSPI_IOCTL_CONF_FRAME_MODE | DriverSPI_IOCTL_CONF_FRAME_NORMAL , 0x00 );
+    /// Send data bytes
+    wrCounter += DriverSPI_write( fd, frm->data , frm->can_dlc );
 
     return wrCounter;
 }
@@ -213,58 +201,54 @@ int MCP2515_read( int fd , void* buffer, unsigned int size ){
             return -1;
     }
 
-    /// CS Enable
-    SPI_ENABLE;
-        /// According with the datasheet, the read instruction
-        //  allows reading RX buffer in the next order:
-        //  IDH, IDL, ID8, ID0, DLC, D0..D7
-        uint8_t canId[5];
+    /// Begin frame
+    DriverSPI_ioctl( fd, DriverSPI_IOCTL_CONF_FRAME_MODE | DriverSPI_IOCTL_CONF_FRAME_PARTITION , 0x00 );
+    /// According with the datasheet, the read instruction
+    //  allows reading RX buffer in the next order:
+    //  IDH, IDL, ID8, ID0, DLC, D0..D7
+    uint8_t canId[5];
 
-        /// Read Frame command
-        DriverSPI_write( fd, &mcp_read_instruction, 1 );
+    /// Read Frame command
+    DriverSPI_write( fd, &mcp_read_instruction, 1 );
 
-        /// Read IDH,IDL,ID8,ID0 and DLC
-        rdCounter = DriverSPI_read( fd , canId , sizeof(canId) );
+    /// Read IDH,IDL,ID8,ID0 and DLC
+    rdCounter = DriverSPI_read( fd , canId , sizeof(canId) );
 
-        /// CAN ID Needs reorder
+    /// CAN ID Needs reorder
 
-        /// Setting Standard CAN ID
-        frm->can_id.ID = 0x00;
-        frm->can_id.CAN_ID_STD = ((uint16_t)canId[0])<<3;
-        frm->can_id.CAN_ID_STD |= canId[1]>>5;
+    /// Setting Standard CAN ID
+    frm->can_id.ID = 0x00;
+    frm->can_id.CAN_ID_STD = ((uint16_t)canId[0])<<3;
+    frm->can_id.CAN_ID_STD |= canId[1]>>5;
 
-        /// Extended Frame Format
-        frm->can_id.CAN_ID_EFF = (canId[1] & MCP2515_RX_BUFF_ID_LOW_IDE)? 1: 0;
+    /// Extended Frame Format
+    frm->can_id.CAN_ID_EFF = (canId[1] & MCP2515_RX_BUFF_ID_LOW_IDE)? 1: 0;
 
-        /// Standard Frame Remote Transmit Request
-        frm->can_id.CAN_ID_RTR = (canId[1] & MCP2515_RX_BUFF_ID_LOW_SRR)? 1: 0;
+    /// Standard Frame Remote Transmit Request
+    frm->can_id.CAN_ID_RTR = (canId[1] & MCP2515_RX_BUFF_ID_LOW_SRR)? 1: 0;
 
-        if( frm->can_id.CAN_ID_EFF ){
-            /// Extended Frame Remote Transmit Request
-            frm->can_id.CAN_ID_RTR |= (canId[4] & MCP2515_RX_DLC_RTR)? 1: 0;
+    if( frm->can_id.CAN_ID_EFF ){
+        /// Extended Frame Remote Transmit Request
+        frm->can_id.CAN_ID_RTR |= (canId[4] & MCP2515_RX_DLC_RTR)? 1: 0;
 
-            /// Setting Extended CAN ID
-            frm->can_id.CAN_ID_EXT = ((uint32_t)canId[1] & 0x03)<<16;
-            frm->can_id.CAN_ID_EXT |= ((uint32_t)canId[2]) << 8;
-            frm->can_id.CAN_ID_EXT |= canId[3];
-        }else{
-            frm->can_id.CAN_ID_EXT = 0;
-        }
+        /// Setting Extended CAN ID
+        frm->can_id.CAN_ID_EXT = ((uint32_t)canId[1] & 0x03)<<16;
+        frm->can_id.CAN_ID_EXT |= ((uint32_t)canId[2]) << 8;
+        frm->can_id.CAN_ID_EXT |= canId[3];
+    }else{
+        frm->can_id.CAN_ID_EXT = 0;
+    }
 
-        /// Set Data Length Code
-        frm->can_dlc = canId[4] & 0x1F;
+    /// Set Data Length Code
+    frm->can_dlc = canId[4] & 0x1F;
 
-        /// Validate Data Length Code
-        if(frm->can_dlc > MCP2515_MAX_FRAME_DATA_LENGTH){
-            SPI_DISABLE;
-            return -1;
-        }
-
-        /// Read Frame Bytes
-        rdCounter += DriverSPI_read( fd , &frm->data , frm->can_dlc );
-    /// CS Disable
-    SPI_DISABLE;
-
+    /// Validate Data Length Code
+    if(frm->can_dlc > MCP2515_MAX_FRAME_DATA_LENGTH){
+        frm->can_dlc = MCP2515_MAX_FRAME_DATA_LENGTH;
+    }
+    /// Ending of the frame
+    DriverSPI_ioctl( fd, DriverSPI_IOCTL_CONF_FRAME_MODE | DriverSPI_IOCTL_CONF_FRAME_PARTITION , 0x00 );
+    rdCounter += DriverSPI_read( fd , &frm->data , frm->can_dlc );
     return rdCounter;
 }
 ///	Release controller

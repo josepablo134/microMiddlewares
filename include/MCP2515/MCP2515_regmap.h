@@ -182,6 +182,28 @@
 		#define MCP2515_CMD_RTS_TX_2					0x84
 		#define MCP2515_CMD_RTS_TX_ALL					0x87
 
+   	    // RX STATUS Bits
+        #define MCP2515_RX_STATUS_RXF_MASK              0x07
+        #define MCP2515_RX_STATUS_RXF0                  0x00
+        #define MCP2515_RX_STATUS_RXF1                  0x01
+        #define MCP2515_RX_STATUS_RXF2                  0x02
+        #define MCP2515_RX_STATUS_RXF3                  0x03
+        #define MCP2515_RX_STATUS_RXF4                  0x04
+        #define MCP2515_RX_STATUS_RXF5                  0x05
+        #define MCP2515_RX_STATUS_RXF0_RXB1             0x06
+        #define MCP2515_RX_STATUS_RXF1_RXB1             0x07
+   	    ///
+        #define MCP2515_RX_STATUS_MSG_TYPE_MASK         0x18
+        #define MCP2515_RX_STATUS_MSG_STD               0x00
+        #define MCP2515_RX_STATUS_MSG_STD_RTR           0x08
+        #define MCP2515_RX_STATUS_MSG_EFF               0x10
+        #define MCP2515_RX_STATUS_MSG_EFF_RTR           0x18
+   	    ///
+        #define MCP2515_RX_STATUS_MSG_RCV_MASK          0xC0
+        #define MCP2515_RX_STATUS_MSG_RCV_RXB0          0x40
+        #define MCP2515_RX_STATUS_MSG_RCV_RXB1          0x80
+        #define MCP2515_RX_STATUS_MSG_RCV_RXBX          0xC0
+
 		// Modes of Operation
 		#define MCP2515_OP_MODE_MASK					0xE0
 		#define MCP2515_OP_MODE_NORMAL					0x00
@@ -202,14 +224,14 @@
 		#define MCP2515_SAM_3X							0x40
 
    	    /// One-shot mode
-   	    #define MCP2515_OSM_MASK                        0x08
-        #define MCP2515_OSM_ENABLED                     0x08
-        #define MCP2515_OSM_DISABLED                    0x00
+   	    #define MCP2515_OSM_MASK						0x08
+        #define MCP2515_OSM_ENABLED						0x08
+        #define MCP2515_OSM_DISABLED					0x00
 
         /// Abort all pending transmissions
-        #define MCP2515_ABAT_MASK                        0x10
-        #define MCP2515_ABAT_ENABLED                     0x10
-        #define MCP2515_ABAT_DISABLED                    0x00
+        #define MCP2515_ABAT_MASK						0x10
+        #define MCP2515_ABAT_ENABLED					0x10
+        #define MCP2515_ABAT_DISABLED					0x00
 
 		// Interrupt settings
 		#define MCP2515_DISABLE_ALL_INTS				0x00
@@ -237,7 +259,7 @@
 		#define MCP2515_TX1RTS_PIN_RTS					0x02
 		#define MCP2515_TX2RTS_PIN_RTS					0x04
 	
-    #define MCP2515_MAX_FRAME_DATA_LENGTH       0x08
+    #define MCP2515_MAX_FRAME_DATA_LENGTH				0x08
 
 #ifdef __cplusplus
 	}
