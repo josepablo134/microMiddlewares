@@ -2,6 +2,14 @@
 # @file CMakeLists.txt
 # @author Josepablo C (josepablo134@gmail.com)
 ################################################################################
+cmake_minimum_required( VERSION 3.18.4 )
+
+project( microMiddlewares
+		DESCRIPTION "Project template for TivaC microcontroller"
+		VERSION 1.0.0
+		LANGUAGES C ASM
+)
+
 set(COMPONENT_NAME MicroMiddlewares)
 set(TIVAC_MODEL TivaCTM4C1294)
 
