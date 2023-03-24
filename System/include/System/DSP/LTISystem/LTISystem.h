@@ -8,7 +8,6 @@
 *	\f[
 *		\frac{Y(z)}{X(z)} = \frac{ b0 + (b1) z^{-1} + ... + (bm) z^{-m} }{ a0 + (a1) z^{-1} + ... + (an) z^{-n} }
 *	\f]
-*
 *	with m <= n
 *	Where m is the numerator order and n is the denominator order.
 *	
